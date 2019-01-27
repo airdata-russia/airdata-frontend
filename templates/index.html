@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load humanize %}
+
+{% block page-styles %}
+    <link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+    <div class="value_preposition ">
+        <div class="container">
+            <form class="find-region">
+
+                <div class="form-group">
+                    <input type="text" id="regionSearch" class="form-control" placeholder="Введите название района/города/региона">
+                </div>
+            </form>
+            <div class="region-list">
+                <p><a href="/moskva/">Москва</a></p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="container summary">
+        <h2 style="margin-bottom: 50px">Человек погибло</h2>
+        <div class="row">
+
+            <div class="col-md-4 date-summary">
+                <p class="date">3 июня</p>
+                <p class="count">27</p>
+            </div>
+            <div class="col-md-4 date-summary">
+                <p class="date">За апрель</p>
+                <p class="count">1078</p>
+            </div>
+            <div class="col-md-4 date-summary">
+                <p class="date">За 2017 год</p>
+                <p class="count">19088</p>
+            </div>
+        </div>
+
+    </div>
+    <hr>
+    <div class="container text-center partner">
+    <h5>Ежегодно на дорогах России погибает 20000 человек. Мы создаем сервис, который делает дороги безопаснее. Если вы разделяете наши ценности, то поддержите нас.</h5>
+        <a href="/about/#partner" class="btn btn-info" role="button">Поддержать</a>
+    </div>
+
+{% endblock %}
+
+{% block page-scripts %}
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+
+    <script>
+        (function () {
+            function makeSearch(term, callback) {
+                $.get('/api/search_region/?term=' + term).done(function (data) {
+                    options = data.regions.map(function (region) {
+                        return {
+                            label: region.name,
+                            value: region.name,
+                            actualValue: region.alias
+                        }
+                    })
+                    callback(options);
+                });
+            }
+
+            function goToRegionPage(regionAlias) {
+                var url = '/' + regionAlias + '/';
+                window.location.href = url;
+            }
+
+            $('#regionSearch').autocomplete({
+                minLength: 2,
+                source: function (request, response) {
+                    makeSearch(request.term, response);
+                },
+                select: function (event, ui) {
+                    goToRegionPage(ui.item.actualValue);
+                }
+            });
+        })();
+    </script>
+{% endblock %}
